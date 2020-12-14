@@ -1,0 +1,80 @@
+<title>Regular Polygon</title>
+<canvas id="board"></canvas>
+<style>
+    canvas {
+        background : black;
+    }
+    body {
+        margin : 0px;
+    }
+</style>
+<script>
+    var cvs = document.getElementById('board');
+    var c = cvs.getContext('2d');
+    cvs.width = innerWidth;
+    cvs.height = innerHeight;
+    var indent = 
+    {
+        x : cvs.width/2,
+        y : cvs.height/2
+    };
+    var lineWidth = 100;
+    var moveThing = false;
+    var angle = 60;
+    var lineIteration = 3;
+    function mainDraw() {
+        c.fillStyle = 'black';
+        c.fillRect(0,0,cvs.width,cvs.height);
+        var currAngle = 0;
+        var currpos = {
+            x : indent.x,
+            y : indent.y
+        }
+        c.strokeStyle = 'white';
+        c.lineWidth = 3;
+        c.beginPath();
+        c.moveTo(indent.x,indent.y);
+        for(i=0;i < lineIteration;i++) {
+            x = currpos.x + lineWidth * Math.cos(currAngle * Math.PI / 180);
+            y = currpos.y + lineWidth * Math.sin(currAngle * Math.PI / 180);
+            c.lineTo(x,y);
+            currAngle -= 180 - angle;
+            currpos.x = x;
+            currpos.y = y;
+        }
+        c.fillStyle = 'white';
+        c.font = '20px Arial';
+        c.fillText(`line segments : ${lineIteration}`, 30, 30);
+        c.fillText(`angle : ${angle}`, 30, 60);
+        c.stroke();
+    }
+    addEventListener('mousemove', event =>{
+        if(moveThing){
+            indent.x = event.clientX - lineWidth/2;
+            indent.y = event.clientY + lineWidth/2;
+            mainDraw();
+        }
+    })
+    addEventListener('click', () => {
+        moveThing = moveThing? false: true;
+    })
+    addEventListener('keydown', event => {
+        if(event.key === 'ArrowLeft') {
+            angle -= 0.5;
+        } else if(event.key === 'ArrowRight') {
+            angle += 0.5;
+        } else if (event.key === 'ArrowUp') {
+            lineIteration++;
+        } else if (event.key === 'ArrowDown' && lineIteration > 1) {
+            lineIteration--;
+        } else if (event.key === 'w' || event.key === 'W') {
+            lineWidth++;
+        } else if (event.key === 's' || event.key === 'S') {
+            lineWidth--;
+        } else if (event.key === 'h' || event.key === 'H') {
+            alert('left right arrow keys : change angle \nup down arrow keys : add/remove line segments\nW/S : change size of line')
+        }
+        mainDraw();
+    })
+    mainDraw();
+</script>

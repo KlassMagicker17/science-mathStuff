@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            margin: 0px;
+            overflow: hidden;
+        }
+
+        canvas {
+            background-color: hsl(200, 20%, 20%);
+        }
+    </style>
+    <title>Mirror Simulator</title>
+</head>
+
+<body>
+    <canvas id="main"></canvas>
+    <script>
+        var cvs = document.getElementById('main');
+        var ctx = cvs.getContext('2d');
+
+
+        cvs.width = innerWidth;
+        cvs.height = innerHeight;
+
+        var clickBoolm = false;
+        var mirrorMode = true;
+        var rayTracing = false;
+        var lineHeight = cvs.height / 2;
+        ctx.font = "12px Arial";
+
+        const cProp = {
+            r: 300,
+            sA: 1.9 * Math.PI,
+            eA: 0.1 * Math.PI,
+            p: Math.round(cvs.width * 0.4),
+            rC: 5
+        }
+
+        var person = {
+            x: 300,
+            h: 50,
+            w: 10
+        }
+
+        function draw() {
+            //calculations and reseting frame
+            ctx.fillStyle = 'hsl(200, 20%, 20%)';
+            ctx.fillRect(0, 0, cvs.width, cvs.height);
+            let f = cProp.r / 2;
+            let dom = cProp.p + cProp.r - person.x;
+            let di = 1 / ((1 / f) - (1 / dom));
+            let hi = di / dom * person.h;
+            if (!mirrorMode) {
+                f = -cProp.r / 2;
+                dom = cProp.p + cProp.r - person.x;
+                di = 1 / ((1 / f) - (1 / dom));
+                hi = di / dom * person.h;
+            }
+
+            //person
+            ctx.fillStyle = 'hsl(0,0%,50%)';
+            ctx.fillRect(person.x + person.w / 2, lineHeight, -person.w, -person.h);
+
+            //reflection
+            ctx.fillStyle = 'hsl(0,0%,50%)';
+            ctx.fillRect(cProp.p + cProp.r - di + person.w / 2, lineHeight, -person.w, hi);
+
+            //rays
+            if (rayTracing) {
+                ctx.fillStyle = 'hsl(0,0%,70%)';
+                ctx.lineWidth = 2;
+                //pass through focal point and then parallel
+                ctx.strokeStyle = 'hsla(0,100%,80%,80%)';
+                ctx.beginPath();
+                ctx.moveTo(person.x, lineHeight - person.h);
+                ctx.lineTo(cProp.p + cProp.r - f, lineHeight);
+                ctx.lineTo(cProp.p + cProp.r, lineHeight + hi);
+                ctx.lineTo(cProp.p + cProp.r - di, lineHeight + hi);
+                ctx.stroke();
+                //parallel and then through focal point
+                ctx.strokeStyle = 'hsla(200,100%,80%,80%)';
+                ctx.beginPath();
+                ctx.moveTo(person.x, lineHeight - person.h);
+                ctx.lineTo(cProp.p + cProp.r, lineHeight - person.h);
+                ctx.lineTo(cProp.p + cProp.r - f, lineHeight);
+                ctx.lineTo(cProp.p + cProp.r - di, lineHeight + hi);
+                ctx.stroke();
+                //center of curvature
+                ctx.strokeStyle = 'hsla(100,100%,80%,80%)';
+                ctx.beginPath();
+                ctx.moveTo(person.x, lineHeight - person.h);
+                if(mirrorMode) {
+                    ctx.lineTo(cProp.p,lineHeight);
+                } else {
+                    ctx.lineTo(cProp.p + cProp.r*2, lineHeight);
+                }
+                ctx.lineTo(cProp.p + cProp.r - di, lineHeight + hi);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(cProp.p + cProp.r - di, lineHeight + hi, 3, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(person.x, lineHeight - person.h, 3, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            //line
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(0, lineHeight);
+            ctx.lineTo(cvs.width, lineHeight);
+            ctx.stroke();
+
+            //mirror or lens
+            ctx.font = '12px Arial';
+            ctx.lineWidth = 3;
+            if (mirrorMode) {
+                ctx.beginPath();
+                ctx.arc(cProp.p, lineHeight, cProp.r, cProp.sA, cProp.eA);
+                ctx.stroke();
+            } else {
+                ctx.beginPath();
+                ctx.arc(cProp.p + cProp.r * 2, lineHeight, cProp.r, 0.9 * Math.PI, 1.1 * Math.PI);
+                ctx.stroke();
+            }
+            ctx.fillStyle = 'white';
+            ctx.fillText('MIRROR', cProp.p + cProp.r + 10, lineHeight + 50);
+
+            //center of curvature or Focal point 2
+            ctx.fillStyle = 'black';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cProp.p, lineHeight, cProp.rC, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cProp.p + cProp.r * 2, lineHeight, cProp.rC, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.fillText('CC', cProp.p + 10, lineHeight + 20);
+            ctx.fillText('CC', 2 * cProp.r + cProp.p + 10, lineHeight + 20);
+
+            //focal point
+            ctx.fillStyle = 'black';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cProp.p + cProp.r / 2, lineHeight, cProp.rC, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cProp.p + cProp.r * 1.5, lineHeight, cProp.rC, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.fillText('F', cProp.p + cProp.r / 2 + 10, lineHeight + 20);
+            ctx.fillText('F', cProp.p + cProp.r + cProp.r / 2 + 10, lineHeight + 20);
+
+            //words
+            ctx.font = '20px Arial';
+            ctx.fillStyle = 'white';
+            if (mirrorMode && -di < 0) {
+                ctx.fillText('Type : Real Image', 10, 80);
+            } else if (mirrorMode && di < 0) {
+                ctx.fillText('Type : Virtual Image', 10, 80);
+            } else if (!mirrorMode) {
+                ctx.fillText('Type : Virtual Image', 10, 80);
+            }
+            ctx.fillText(`Image Height : ${-Math.round(hi) / 10}`, 10, 30);
+            ctx.fillText(`Image Distance : ${Math.round(di) / 10}`, 10, 55);
+            ctx.fillText(`Object Height : ${Math.round(person.h) / 10}`, 250, 30);
+            ctx.fillText(`Object Distance : ${Math.round(dom) / 10}`, 250, 55);
+            requestAnimationFrame(draw);
+        }
+
+        addEventListener('mousemove', event => {
+            if (clickBoolm) {
+                person.x = event.clientX;
+                person.h = lineHeight - event.clientY;
+            }
+        })
+
+        addEventListener('click', event => {
+            clickBoolm = clickBoolm ? false : true;
+            person.x = event.clientX;
+            person.h = lineHeight - event.clientY;
+        })
+        addEventListener('keydown', event => {
+            if (event.code === 'Space') {
+                mirrorMode = mirrorMode ? false : true;
+            }
+            if (event.code === 'KeyR') {
+                rayTracing = rayTracing ? false : true;
+            }
+            if (event.code === 'KeyH') {
+                onload(alert(' Click : Move the object to mouse\n R : Toggle raytracing \n H : Open help menu \n Spacebar : Toggle between concave and convex \n Arrow Keys : Move the object ; Change height'));
+           }
+            if (event.code === 'ArrowRight') {
+                person.x += 1;
+            }
+            if (event.code === 'ArrowLeft') {
+                person.x -= 1;
+            }
+            if (event.code === 'ArrowUp') {
+                person.h += 1;
+            }
+            if (event.code === 'ArrowDown') {
+                person.h -= 1;
+            }
+        })
+        draw();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<style>
+    body {
+        margin: 0px;
+        overflow: hidden;
+    }
+
+    canvas {
+        background-color: hsl(200, 0%, 0%);
+    }
+</style>
+<canvas id="main"></canvas>
+<script>
+    var cvs = document.getElementById('main');
+    var c = cvs.getContext('2d');
+    cvs.width = innerWidth;
+    cvs.height = innerHeight;
+    var xPoly = [14,11,6,7];
+    var yPoly = [19,16,10,11,12,8];
+    var multiplier = 0.001;
+    var t = -3;
+    const dotCount = 10000;
+    function psuedoPolynomial(poly, x, y, t) {
+        let mainVal = 0;
+        for (i = 0; i <= poly.length; i++) {
+            if (poly[i] === 0) {
+                mainVal += 0;
+            } else if (poly[i] === 1) {
+                mainVal += x;
+            } else if (poly[i] === 2) {
+                mainVal += y;
+            } else if (poly[i] === 3) {
+                mainVal += t;
+            } else if (poly[i] === 4) {
+                mainVal += x * y;
+            } else if (poly[i] === 5) {
+                mainVal += x * t;
+            } else if (poly[i] === 6) {
+                mainVal += y * t;
+            } else if (poly[i] === 7) {
+                mainVal += -x;
+            } else if (poly[i] === 8) {
+                mainVal += -y;
+            } else if (poly[i] === 9) {
+                mainVal += -t;
+            } else if (poly[i] === 10) {
+                mainVal += -x * y;
+            } else if (poly[i] === 11) {
+                mainVal += -x * t;
+            } else if (poly[i] === 12) {
+                mainVal = -y * t;
+            } else if (poly[i] === 13) {
+                mainVal += x * y * t;
+            } else if (poly[i] === 14) {
+                mainVal += x ** 2;
+            } else if (poly[i] === 15) {
+                mainVal += y ** 2;
+            } else if (poly[i] === 16) {
+                mainVal += t ** 2;
+            } else if (poly[i] === 17) {
+                mainVal -= x ** 2;
+            } else if (poly[i] === 18) {
+                mainVal -= y ** 2;
+            } else if (poly[i] === 19) {
+                mainVal -= t ** 2;
+            }
+        }
+        return mainVal;
+    }
+    function draw() {
+        t += 0.001;
+        c.fillStyle = 'hsla(0,0%,0%,10%)'
+        c.fillRect(0, 0, cvs.width, cvs.height);
+        var x = t;
+        var y = t;
+        c.fillStyle = "hsl(200,0%,100%)";
+        c.strokeStyle = 'hsl(0,0%,30%)';
+        c.beginPath();
+        c.moveTo(cvs.width, cvs.height / 2);
+        c.lineTo(0, cvs.height / 2);
+        c.stroke();
+        c.beginPath();
+        c.moveTo(cvs.width / 2, 0);
+        c.lineTo(cvs.width / 2, cvs.height);
+        c.stroke();
+        for (j = 0; j < dotCount; j++) {
+            x = psuedoPolynomial(xPoly, x, y, t);
+            y = psuedoPolynomial(xPoly, x, y, t);
+            c.fillRect(cvs.width / 2 + x * multiplier, cvs.height / 2 + y * multiplier, 3, 3);
+        }
+        requestAnimationFrame(draw);
+    }
+    addEventListener('keydown', event => {
+        if (event.code === 'ArrowUp') {
+            multiplier += 0.5;
+        } else if (event.code === 'ArrowDown' && multiplier != 0.05) {
+            multiplier -= 0.5;
+        } else if (event.code === 'ArrowRight') {
+            t += 0.005;
+        } else if (event.code === 'ArrowLeft') {
+            t -= 0.02;
+        }
+    })
+    draw();
+</script>
+
+</html>

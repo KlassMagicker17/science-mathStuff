@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script>
+		var xIn = 300;
+		var yIn = 80;
+
+		var mouseClicked = false, mouseReleased = true;
+		document.addEventListener("click", onMouseClick, false);
+		document.addEventListener("mousemove", onMouseMove, false);
+		function onMouseClick() {
+			if (event.clientX >= 250) {
+				mouseClicked = !mouseClicked;
+				xIn = event.clientX;
+				yIn = event.clientY;
+				move();
+			}
+		}
+		function onMouseMove() {
+			var c = document.getElementById("cvs");
+			var ctx = c.getContext("2d");
+
+			if (mouseClicked && event.clientX >= 250) {
+				xIn = event.clientX;
+				yIn = event.clientY;
+				move();
+			}
+		}
+		//ctx.fillStyle = 'rgba(50,50,50,0.1)';
+		function move() {
+			var a = document.getElementById("angle").value;
+			var v = document.getElementById("velocity").value;
+			var r = document.getElementById("radius").value;
+			var g = document.getElementById("gravity").value;
+			var t = 0;
+			var it = document.getElementById("iteration").value;
+			var c = document.getElementById("cvs");
+			var ctx = c.getContext("2d");
+			var height = c.height = window.innerHeight;
+			var width = c.width = window.innerWidth;
+			x = ((v * Math.cos(a * Math.PI / 180)) * it) + xIn;
+			y = -(((v * Math.sin(a * Math.PI / 180)) * it + (g * it ** 2) / 2)) + yIn;
+			ctx.fillStyle = 'rgb(50,50,50)';
+			for (i = 0; i <= it; i++) {
+				if (document.getElementById("moving").checked && i != it) {
+					ctx.fillStyle = 'rgba(50,50,50,0.1)';
+				}
+				var ti = document.getElementById("tmeInt").value;
+				x = ((v * Math.cos(a * Math.PI / 180)) * t) + xIn;
+				y = -(((v * Math.sin(a * Math.PI / 180)) * t + (g * t ** 2) / 2)) + yIn;
+				ctx.beginPath();
+				ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+				ctx.fill();
+				t += parseFloat(ti);
+				ctx.fillStyle = 'rgb(50,50,50)';
+			}
+			
+			// ctx.beginPath();
+			// ctx.moveTo(xIn, yIn);
+			// var xThing = ((v * Math.cos(a * Math.PI / 180)) * it / 2) + xIn;
+			// var yThing = -(((v * Math.sin(a * Math.PI / 180)) * (it/2) + (g * (it/2) ** 2) / 2)) + yIn;
+			// ctx.bezierCurveTo(xThing, yThing,x,y, x, y);
+			// ctx.stroke();
+			// ctx.beginPath();
+			// ctx.arc(xThing, yThing, r, 0, 2 * Math.PI, false);
+			// ctx.fill();
+
+			//(0.5) * xIn/2 + 0.5 * x
+			var as = document.getElementById("angle");
+			var vs = document.getElementById("velocity");
+			var gs = document.getElementById("gravity");
+			var its = document.getElementById("iteration");
+			var tis = document.getElementById("tmeInt");
+			var rs = document.getElementById("radius");
+
+			var aP = document.getElementsByName("aglP");
+			var vP = document.getElementsByName("vlcP");
+			var gP = document.getElementsByName("grvP");
+			var itP = document.getElementsByName("itP");
+			var IntP = document.getElementsByName("tIntP");
+			var rP = document.getElementsByName("rP");
+
+			var mode = document.getElementById("mode");
+
+			if (document.getElementById("normal").checked) {
+				mode.innerHTML = "Showing All Balls";
+			} else {
+				mode.innerHTML = "Showing Last Ball";
+			}
+
+			for (i = 0; i < aP.length; i++) {
+				aP[i].innerHTML = "angle " + as.value + " (θ)";
+				vP[i].innerHTML = "velocity " + vs.value + " (v)";
+				gP[i].innerHTML = "gravity " + gs.value + " (g)";
+				itP[i].innerHTML = "Iterations " + its.value + " (?)";
+				IntP[i].innerHTML = "time interval " + tis.value + " (t)";
+				rP[i].innerHTML = "Circle size " + rs.value + " (r)";
+			}
+		}
+	</script>
+	<style>
+		canvas {
+			background-color: rgb(119, 161, 218);
+			z-index: 0;
+		}
+
+		form {
+			position: absolute;
+			top: 50px;
+			left: 20px;
+			width: 200px;
+			font-family: monospace;
+			font-size: 13px;
+		}
+
+		body {
+			background-color: rgb(119, 161, 218);
+			margin: 0;
+			overflow: hidden;
+		}
+
+		h1 {
+			font-family: "Bauhaus 93";
+			text-align: center;
+			z-index: 1;
+		}
+
+		input[type=range] {
+			-webkit-appearance: none;
+			width: 100%;
+			margin: 13.8px 0;
+		}
+
+		input[type=range]:focus {
+			outline: none;
+		}
+
+		input[type=range]::-webkit-slider-runnable-track {
+			width: 100%;
+			height: 1.2vh;
+			cursor: pointer;
+			box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+			background: #3071a9;
+			border-radius: 1.3px;
+			border: 0.2px solid #010101;
+		}
+
+		input[type=range]::-webkit-slider-thumb {
+			box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+			border: 1px solid #000000;
+			height: 30px;
+			width: 20px;
+			border-radius: 3px;
+			background: #ffffff;
+			cursor: pointer;
+			-webkit-appearance: none;
+			margin-top: -14px;
+		}
+
+		input[type=range]:focus::-webkit-slider-runnable-track {
+			background: #367ebd;
+		}
+
+		input[type=range]::-moz-range-track {
+			width: 100%;
+			height: 8.4px;
+			cursor: pointer;
+			box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+			background: #3071a9;
+			border-radius: 1.3px;
+			border: 0.2px solid #010101;
+		}
+
+		input[type=range]::-moz-range-thumb {
+			box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+			border: 1px solid #000000;
+			height: 36px;
+			width: 16px;
+			border-radius: 3px;
+			background: #ff99ff;
+			cursor: pointer;
+		}
+
+		input[type=range]::-ms-track {
+			width: 100%;
+			height: 8.4px;
+			cursor: pointer;
+			background: transparent;
+			border-color: transparent;
+			color: transparent;
+		}
+
+		input[type=range]::-ms-fill-lower {
+			background: #2a6495;
+			border: 0.2px solid #010101;
+			border-radius: 2.6px;
+			box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+		}
+
+		input[type=range]::-ms-fill-upper {
+			background: #3071a9;
+			border: 0.2px solid #010101;
+			border-radius: 2.6px;
+			box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+		}
+
+		input[type=range]::-ms-thumb {
+			box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+			border: 1px solid #000000;
+			height: 36px;
+			width: 16px;
+			border-radius: 3px;
+			background: #ff99ff;
+			cursor: pointer;
+			height: 8.4px;
+		}
+
+		input[type=range]:focus::-ms-fill-lower {
+			background: #3071a9;
+		}
+
+		input[type=range]:focus::-ms-fill-upper {
+			background: #367ebd;
+		}
+
+		div {
+			position: fixed;
+			bottom: 0px;
+			right: 5px;
+			align-items: right;
+			text-align: right;
+		}
+
+		span {
+			font-family: monospace;
+			font-size: 4.5vh;
+			text-size-adjust: auto;
+			color: white;
+
+		}
+	</style>
+</head>
+
+<body onload="move()" onresize="move()">
+	<canvas id="cvs"></canvas>
+	<form oninput="move()">
+		<input type="range" id="angle" min=-180 max=180 value=0 step="0.5">
+		<p name="aglP">angle</p><br>
+
+		<input type="range" id="velocity" min=0 max=150 value=50 step="0.5">
+		<p name="vlcP">velocity</p><br>
+
+		<input type="range" id="gravity" min=-30 max=30 value=-10 step="0.5">
+		<p name="grvP">gravity</p><br>
+
+		<input type="range" id="iteration" min=0 max=200 value=5 step="1">
+		<p name="itP">iterations</p><br>
+
+		<input type="range" id="tmeInt" min=0 max=5 value=1 step="0.1">
+		<p name="tIntP">time interval</p><br>
+
+		<input type="range" id="radius" min=1 max=100 value=20 step="0.5">
+		<p name="rP">Circle size</p><br>
+
+		<input type="radio" id="normal" name="modes" value="nrm" checked>
+		<label for="normal">Show All</label><br>
+		<input type="radio" id="moving" name="modes" value="mve">
+		<label for="move">Moving</label><br>
+	</form>
+
+	<div>
+		<p>
+			<span name="aglP"></span> </br>
+			<span name="vlcP"></span> </br>
+			<span name="grvP"></span> </br>
+			<span name="itP"></span> </br>
+			<span name="tIntP"></span> </br>
+			<span name="rP"></span> </br>
+			<span id="mode"></span> </br>
+		</p>
+	</div>
+</body>
+
+
+</html>
